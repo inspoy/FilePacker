@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 
 namespace Instech.FilePacker
@@ -7,7 +8,10 @@ namespace Instech.FilePacker
     {
         public static void PackToFile(string basePath, IEnumerable<string> filePaths, string targetPath)
         {
-            throw new NotImplementedException();
+            var packTool = new PackTool(targetPath);
+            foreach(var fileName in filePaths){
+                var fullPath = Path.Combine(basePath,fileName);
+            }
         }
 
         public static void UnpackFile(string filePath, string targetFolder)
