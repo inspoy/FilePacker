@@ -9,9 +9,14 @@ namespace Instech.FilePacker
         public static void PackToFile(string basePath, IEnumerable<string> filePaths, string targetPath)
         {
             var packTool = new PackTool(targetPath);
-            foreach(var fileName in filePaths){
-                var fullPath = Path.Combine(basePath,fileName);
+            packTool.Create();
+            foreach (var fileName in filePaths)
+            {
+                var fullPath = Path.Combine(basePath, fileName);
+                var content = File.ReadAllBytes(fullPath);
+                packTool.AddContent(fileName, content);
             }
+            packTool.Save();
         }
 
         public static void UnpackFile(string filePath, string targetFolder)
