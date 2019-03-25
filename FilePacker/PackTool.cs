@@ -1,17 +1,18 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 namespace Instech.FilePacker
 {
-    internal class FileItemMeta
+    internal struct FileItemMeta
     {
         public uint Offset;
     }
 
     internal class PackTool
     {
-        private stirng _ipkPath;
+        private string _ipkPath;
         private uint _currenctPosition;
         private Dictionary<string, FileItemMeta> _fileList;
         public PackTool(string ipkPath)
@@ -21,7 +22,7 @@ namespace Instech.FilePacker
 
         public void Create()
         {
-            File.Create(_ipkPath);
+            File.WriteAllBytes(_ipkPath, Array.Empty<byte>());
             _currenctPosition = 0;
             _fileList = new Dictionary<string, FileItemMeta>();
         }
@@ -39,7 +40,7 @@ namespace Instech.FilePacker
             {
                 Offset = _currenctPosition
             });
-            _currenctPosition += content.Length;
+            _currenctPosition += (uint)content.Length;
         }
 
         public void Save()
@@ -47,7 +48,7 @@ namespace Instech.FilePacker
             var dirName = Path.GetDirectoryName(_ipkPath);
             var ipkName = Path.GetFileNameWithoutExtension(_ipkPath);
             var ipmPath = Path.Combine(dirName, ipkName + ".ipm");
-            using (var fs = new FileStream(ipmPath, FileMode.Open))
+            using (var fs = new FileStream(ipmPath, FileMode.Create))
             {
                 using (var bw = new BinaryWriter(fs))
                 {

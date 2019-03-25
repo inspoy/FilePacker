@@ -21,7 +21,7 @@ namespace Instech.FilePacker
 
         public static void UnpackFile(string filePath, string targetFolder)
         {
-            throw new NotImplementedException();
+            UnpackTool.UnpackAll(filePath, targetFolder);
         }
 
         public static byte[] ReadFileContent(string filePath, string fileName)
