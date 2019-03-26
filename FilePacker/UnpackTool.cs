@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -22,12 +23,45 @@ namespace Instech.FilePacker
             {
                 throw new InvalidOperationException("Ipm file does not exist.");
             }
-            using (var fs = new FileStream(ipmPath, FileMode.Open))
+            var fileList = new Dictionary<string, FileItemMeta>();
+            using (var fs = new FileStream(ipmPath, FileMode.Open, FileAccess.Read))
             {
                 using (var br = new BinaryReader(fs))
                 {
                     var count = br.ReadInt32();
+                    for (var i = 0; i < count; ++i)
+                    {
+                        ReadIpmItem(br, out var key, out var item);
+                        fileList.Add(key, item);
+                    }
                 }
+            }
+            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            {
+                foreach (var item in fileList)
+                {
+                    fs.Seek((long)item.Value.Offset, SeekOrigin.Begin);
+                    var content = new byte[item.Value.Length];
+                    fs.Read(content, 0, (int)item.Value.Length);
+                    var itemPath = Path.Combine(targetFolder, item.Key);
+                    Console.WriteLine("Outputing: " + itemPath);
+                    File.WriteAllBytes(itemPath, content);
+                }
+            }
+        }
+
+        private static void ReadIpmItem(BinaryReader br, out string key, out FileItemMeta item)
+        {
+            try
+            {
+                key = br.ReadString();
+                item = new FileItemMeta();
+                item.Offset = br.ReadUInt64();
+                item.Length = br.ReadUInt64();
+            }
+            catch (EndOfStreamException e)
+            {
+                throw new BadImageFormatException("Reading ipm file failed.", e);
             }
         }
     }

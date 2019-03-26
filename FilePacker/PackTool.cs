@@ -7,7 +7,8 @@ namespace Instech.FilePacker
 {
     internal struct FileItemMeta
     {
-        public uint Offset;
+        public ulong Offset;
+        public ulong Length;
     }
 
     internal class PackTool
@@ -29,7 +30,7 @@ namespace Instech.FilePacker
 
         public void AddContent(string key, byte[] content)
         {
-            using (var fs = new FileStream(_ipkPath, FileMode.Append))
+            using (var fs = new FileStream(_ipkPath, FileMode.Append, FileAccess.Write))
             {
                 using (var bw = new BinaryWriter(fs))
                 {
@@ -38,7 +39,8 @@ namespace Instech.FilePacker
             }
             _fileList.Add(key, new FileItemMeta
             {
-                Offset = _currenctPosition
+                Offset = _currenctPosition,
+                Length = (ulong)content.Length
             });
             _currenctPosition += (uint)content.Length;
         }
@@ -48,7 +50,7 @@ namespace Instech.FilePacker
             var dirName = Path.GetDirectoryName(_ipkPath);
             var ipkName = Path.GetFileNameWithoutExtension(_ipkPath);
             var ipmPath = Path.Combine(dirName, ipkName + ".ipm");
-            using (var fs = new FileStream(ipmPath, FileMode.Create))
+            using (var fs = new FileStream(ipmPath, FileMode.Create, FileAccess.Write))
             {
                 using (var bw = new BinaryWriter(fs))
                 {
@@ -57,6 +59,7 @@ namespace Instech.FilePacker
                     {
                         bw.Write(item.Key);
                         bw.Write(item.Value.Offset);
+                        bw.Write(item.Value.Length);
                     }
                 }
             }
