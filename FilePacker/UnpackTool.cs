@@ -44,6 +44,11 @@ namespace Instech.FilePacker
                     var content = new byte[item.Value.Length];
                     fs.Read(content, 0, (int)item.Value.Length);
                     var itemPath = Path.Combine(targetFolder, item.Key);
+                    var itemFolder = Path.GetDirectoryName(itemPath);
+                    if (!Directory.Exists(itemFolder))
+                    {
+                        Directory.CreateDirectory(itemFolder);
+                    }
                     Console.WriteLine("Outputing: " + itemPath);
                     File.WriteAllBytes(itemPath, content);
                 }
