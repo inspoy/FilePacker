@@ -26,7 +26,24 @@ namespace Instech.FilePacker
 
         public static byte[] ReadFileContent(string filePath, string fileName)
         {
-            throw new NotImplementedException();
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException("File does not exist", filePath);
+            }
+            var ipmPath = Path.Combine(Path.GetDirectoryName(filePath), Path.GetFileNameWithoutExtension(filePath) + ".ipm");
+            var fileList = UnpackTool.LoadIpm(ipmPath);
+            if (!fileList.ContainsKey(fileName))
+            {
+                throw new KeyNotFoundException($"{fileName} does not exist in {filePath}");
+            }
+            var ipmItem = fileList[fileName];
+            using (var fs = new FileStream(filePath, FileMode.Open))
+            {
+                fs.Seek((long)ipmItem.Offset, SeekOrigin.Begin);
+                var content = new byte[ipmItem.Length];
+                fs.Read(content, 0, (int)ipmItem.Length);
+                return content;
+            }
         }
     }
 }

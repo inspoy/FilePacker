@@ -28,7 +28,7 @@ namespace TestRunner
             FilePacker.UnpackFile(ipkPath, testFolder + "/output");
             Console.WriteLine("=====END======");
             Console.WriteLine("==ReadSingle==");
-            var content = FilePacker.ReadFileContent(ipkPath, "/test.txt");
+            var content = FilePacker.ReadFileContent(ipkPath, "test.txt");
             File.WriteAllBytes(testFolder + "/test.txt", content);
             Console.WriteLine("=====END======");
         }

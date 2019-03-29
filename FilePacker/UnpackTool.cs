@@ -23,19 +23,7 @@ namespace Instech.FilePacker
             {
                 throw new InvalidOperationException("Ipm file does not exist.");
             }
-            var fileList = new Dictionary<string, FileItemMeta>();
-            using (var fs = new FileStream(ipmPath, FileMode.Open, FileAccess.Read))
-            {
-                using (var br = new BinaryReader(fs))
-                {
-                    var count = br.ReadInt32();
-                    for (var i = 0; i < count; ++i)
-                    {
-                        ReadIpmItem(br, out var key, out var item);
-                        fileList.Add(key, item);
-                    }
-                }
-            }
+            var fileList = LoadIpm(ipmPath);
             using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
                 foreach (var item in fileList)
@@ -53,6 +41,28 @@ namespace Instech.FilePacker
                     File.WriteAllBytes(itemPath, content);
                 }
             }
+        }
+
+        public static Dictionary<string, FileItemMeta> LoadIpm(string ipmPath)
+        {
+            if (!File.Exists(ipmPath))
+            {
+                throw new InvalidOperationException("Ipm file does not exist.");
+            }
+            var fileList = new Dictionary<string, FileItemMeta>();
+            using (var fs = new FileStream(ipmPath, FileMode.Open, FileAccess.Read))
+            {
+                using (var br = new BinaryReader(fs))
+                {
+                    var count = br.ReadInt32();
+                    for (var i = 0; i < count; ++i)
+                    {
+                        ReadIpmItem(br, out var key, out var item);
+                        fileList.Add(key, item);
+                    }
+                }
+            }
+            return fileList;
         }
 
         private static void ReadIpmItem(BinaryReader br, out string key, out FileItemMeta item)
