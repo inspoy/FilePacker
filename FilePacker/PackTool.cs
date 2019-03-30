@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Instech.CryptHelper;
 
 namespace Instech.FilePacker
 {
@@ -15,21 +16,29 @@ namespace Instech.FilePacker
     {
         private string _ipkPath;
         private uint _currenctPosition;
+        private string _key;
         private Dictionary<string, FileItemMeta> _fileList;
         public PackTool(string ipkPath)
         {
             _ipkPath = ipkPath;
         }
 
-        public void Create()
+        public void Create(string key)
         {
             File.WriteAllBytes(_ipkPath, Array.Empty<byte>());
             _currenctPosition = 0;
             _fileList = new Dictionary<string, FileItemMeta>();
+            _key = key;
         }
 
         public void AddContent(string key, byte[] content)
         {
+            if (!string.IsNullOrEmpty(_key))
+            {
+                // 使用RC4算法加密
+                var rc4 = new Rc4();
+                rc4.SetKeyAndInit(_key);
+            }
             using (var fs = new FileStream(_ipkPath, FileMode.Append, FileAccess.Write))
             {
                 using (var bw = new BinaryWriter(fs))

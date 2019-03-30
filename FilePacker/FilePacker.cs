@@ -6,10 +6,10 @@ namespace Instech.FilePacker
 {
     public static class FilePacker
     {
-        public static void PackToFile(string basePath, IEnumerable<string> filePaths, string targetPath)
+        public static void PackToFile(string basePath, IEnumerable<string> filePaths, string targetPath, string key = null)
         {
             var packTool = new PackTool(targetPath);
-            packTool.Create();
+            packTool.Create(key);
             foreach (var fileName in filePaths)
             {
                 var fullPath = Path.Combine(basePath, fileName);
