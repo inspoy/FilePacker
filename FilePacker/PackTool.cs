@@ -17,6 +17,7 @@ namespace Instech.FilePacker
         private string _ipkPath;
         private uint _currenctPosition;
         private string _key;
+        private Rc4 _rc4;
         private Dictionary<string, FileItemMeta> _fileList;
         public PackTool(string ipkPath)
         {
@@ -29,15 +30,42 @@ namespace Instech.FilePacker
             _currenctPosition = 0;
             _fileList = new Dictionary<string, FileItemMeta>();
             _key = key;
-        }
-
-        public void AddContent(string key, byte[] content)
-        {
             if (!string.IsNullOrEmpty(_key))
             {
+                _rc4 = new Rc4();
+            }
+        }
+
+        internal static byte[] GetCryptKey(string fileKey, string ipkKey)
+        {
+            var b1 = Encoding.UTF8.GetBytes(fileKey);
+            var b2 = Encoding.UTF8.GetBytes(ipkKey);
+            var ret = new byte[Math.Max(b1.Length, b2.Length)];
+            for (var i = 0; i < ret.Length; ++i)
+            {
+                if (i < b1.Length && i < b2.Length)
+                {
+                    ret[i] = (byte)(b1[i] ^ b2[i]);
+                }
+                else if (i < b1.Length)
+                {
+                    ret[i] = b1[i];
+                }
+                else if (i < b2.Length)
+                {
+                    ret[i] = b2[i];
+                }
+            }
+            return ret;
+        }
+
+        public void AddContent(string fileKey, byte[] content)
+        {
+            if (_rc4 != null)
+            {
                 // 使用RC4算法加密
-                var rc4 = new Rc4();
-                rc4.SetKeyAndInit(_key);
+                _rc4.SetKeyAndInit(GetCryptKey(fileKey, _key));
+                content = _rc4.Encrypt(content);
             }
             using (var fs = new FileStream(_ipkPath, FileMode.Append, FileAccess.Write))
             {
@@ -46,7 +74,7 @@ namespace Instech.FilePacker
                     bw.Write(content);
                 }
             }
-            _fileList.Add(key, new FileItemMeta
+            _fileList.Add(fileKey, new FileItemMeta
             {
                 Offset = _currenctPosition,
                 Length = (ulong)content.Length

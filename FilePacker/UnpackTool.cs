@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Instech.CryptHelper;
 
 namespace Instech.FilePacker
 {
     internal class UnpackTool
     {
-        public static void UnpackAll(string filePath, string targetFolder)
+        public static void UnpackAll(string filePath, string targetFolder, string key = null)
         {
             if (!File.Exists(filePath))
             {
@@ -24,6 +25,11 @@ namespace Instech.FilePacker
                 throw new InvalidOperationException("Ipm file does not exist.");
             }
             var fileList = LoadIpm(ipmPath);
+            Rc4 rc4 = null;
+            if (!string.IsNullOrEmpty(key))
+            {
+                rc4 = new Rc4();
+            }
             using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
                 foreach (var item in fileList)
@@ -38,6 +44,12 @@ namespace Instech.FilePacker
                         Directory.CreateDirectory(itemFolder);
                     }
                     Console.WriteLine("Outputing: " + itemPath);
+                    if (rc4 != null)
+                    {
+                        var cryptKey = PackTool.GetCryptKey(item.Key, key);
+                        rc4.SetKeyAndInit(cryptKey);
+                        content = rc4.Encrypt(content);
+                    }
                     File.WriteAllBytes(itemPath, content);
                 }
             }

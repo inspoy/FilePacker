@@ -11,6 +11,11 @@ namespace TestRunner
         {
             Console.WriteLine("Hello World!");
             var testFolder = Path.Combine(Directory.GetCurrentDirectory(), "TestFolder");
+            var outputFolder = testFolder + "/output";
+            if (Directory.Exists(outputFolder))
+            {
+                Directory.Delete(testFolder + "/output", true);
+            }
             var ipkPath = testFolder + "/output.ipk";
             Console.WriteLine("TestFolder: " + testFolder);
             var rawFolder = testFolder + "/raw";
@@ -22,13 +27,13 @@ namespace TestRunner
                 fileList.Add(reletivePath);
             }
             Console.WriteLine("=====Pack=====");
-            FilePacker.PackToFile(rawFolder, fileList, ipkPath);
+            FilePacker.PackToFile(rawFolder, fileList, ipkPath, "Secret!!!");
             Console.WriteLine("=====END======");
             Console.WriteLine("====Unpack====");
-            FilePacker.UnpackFile(ipkPath, testFolder + "/output");
+            FilePacker.UnpackFile(ipkPath, outputFolder, "Secret!!!");
             Console.WriteLine("=====END======");
             Console.WriteLine("==ReadSingle==");
-            var content = FilePacker.ReadFileContent(ipkPath, "test.txt");
+            var content = FilePacker.ReadFileContent(ipkPath, "test.txt", "Secret!!!");
             File.WriteAllBytes(testFolder + "/test.txt", content);
             Console.WriteLine("=====END======");
         }

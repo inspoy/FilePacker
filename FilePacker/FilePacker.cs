@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using Instech.CryptHelper;
 
 namespace Instech.FilePacker
 {
@@ -19,12 +20,12 @@ namespace Instech.FilePacker
             packTool.Save();
         }
 
-        public static void UnpackFile(string filePath, string targetFolder)
+        public static void UnpackFile(string filePath, string targetFolder, string key = null)
         {
-            UnpackTool.UnpackAll(filePath, targetFolder);
+            UnpackTool.UnpackAll(filePath, targetFolder, key);
         }
 
-        public static byte[] ReadFileContent(string filePath, string fileName)
+        public static byte[] ReadFileContent(string filePath, string fileName, string key = null)
         {
             if (!File.Exists(filePath))
             {
@@ -42,6 +43,12 @@ namespace Instech.FilePacker
                 fs.Seek((long)ipmItem.Offset, SeekOrigin.Begin);
                 var content = new byte[ipmItem.Length];
                 fs.Read(content, 0, (int)ipmItem.Length);
+                if (!string.IsNullOrEmpty(key))
+                {
+                    var rc4 = new Rc4();
+                    rc4.SetKeyAndInit(PackTool.GetCryptKey(fileName, key));
+                    content = rc4.Encrypt(content);
+                }
                 return content;
             }
         }
