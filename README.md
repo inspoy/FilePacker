@@ -5,6 +5,6 @@
 * Pack(Done)
 * Unpack all(Done)
 * Read partial content(done)
-* Pack with encrypt(RC4)
-* Combine ipk and ipm
-* Compress
+* Pack with RC4 encrypt(done)
+* Combine ipk and ipm(done)
+* Compress with gzip

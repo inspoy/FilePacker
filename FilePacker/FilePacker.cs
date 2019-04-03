@@ -1,13 +1,11 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
-using Instech.CryptHelper;
 
 namespace Instech.FilePacker
 {
     public static class FilePacker
     {
-        public static void PackToFile(string basePath, IEnumerable<string> filePaths, string targetPath, string key = null)
+        public static void PackToFile(string basePath, List<string> filePaths, string targetPath, string key = null)
         {
             var packTool = new PackTool(targetPath);
             packTool.Create(key);
@@ -31,26 +29,7 @@ namespace Instech.FilePacker
             {
                 throw new FileNotFoundException("File does not exist", filePath);
             }
-            var ipmPath = Path.Combine(Path.GetDirectoryName(filePath), Path.GetFileNameWithoutExtension(filePath) + ".ipm");
-            var fileList = UnpackTool.LoadIpm(ipmPath);
-            if (!fileList.ContainsKey(fileName))
-            {
-                throw new KeyNotFoundException($"{fileName} does not exist in {filePath}");
-            }
-            var ipmItem = fileList[fileName];
-            using (var fs = new FileStream(filePath, FileMode.Open))
-            {
-                fs.Seek((long)ipmItem.Offset, SeekOrigin.Begin);
-                var content = new byte[ipmItem.Length];
-                fs.Read(content, 0, (int)ipmItem.Length);
-                if (!string.IsNullOrEmpty(key))
-                {
-                    var rc4 = new Rc4();
-                    rc4.SetKeyAndInit(PackTool.GetCryptKey(fileName, key));
-                    content = rc4.Encrypt(content);
-                }
-                return content;
-            }
+            return UnpackTool.UnpackSingle(filePath, fileName, key);
         }
     }
 }

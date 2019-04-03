@@ -14,8 +14,8 @@ namespace Instech.FilePacker
 
     internal class PackTool
     {
-        private string _ipkPath;
-        private uint _currenctPosition;
+        private readonly string _ipkPath;
+        private ulong _currenctPosition;
         private string _key;
         private Rc4 _rc4;
         private Dictionary<string, FileItemMeta> _fileList;
@@ -26,7 +26,7 @@ namespace Instech.FilePacker
 
         public void Create(string key)
         {
-            File.WriteAllBytes(_ipkPath, Array.Empty<byte>());
+            File.WriteAllBytes(_ipkPath, new byte[8]);
             _currenctPosition = 0;
             _fileList = new Dictionary<string, FileItemMeta>();
             _key = key;
@@ -79,15 +79,19 @@ namespace Instech.FilePacker
                 Offset = _currenctPosition,
                 Length = (ulong)content.Length
             });
-            _currenctPosition += (uint)content.Length;
+            _currenctPosition += (ulong)content.Length;
         }
 
         public void Save()
         {
-            var dirName = Path.GetDirectoryName(_ipkPath);
-            var ipkName = Path.GetFileNameWithoutExtension(_ipkPath);
-            var ipmPath = Path.Combine(dirName, ipkName + ".ipm");
-            using (var fs = new FileStream(ipmPath, FileMode.Create, FileAccess.Write))
+            using (var fs = new FileStream(_ipkPath, FileMode.Open, FileAccess.Write))
+            {
+                using (var bw = new BinaryWriter(fs))
+                {
+                    bw.Write(_currenctPosition);
+                }
+            }
+            using (var fs = new FileStream(_ipkPath, FileMode.Append, FileAccess.Write))
             {
                 using (var bw = new BinaryWriter(fs))
                 {
