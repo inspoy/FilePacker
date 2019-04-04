@@ -8,5 +8,10 @@
       <HintPath>CryptHelper.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="K4os.Compression.LZ4">
+      <HintPath>K4os.Compression.LZ4.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 
 </Project>

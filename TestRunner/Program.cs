@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using Instech.FilePacker;
 
@@ -25,25 +26,31 @@ namespace TestRunner
             Console.WriteLine("TestFolder: " + testFolder);
             var rawFolder = testFolder + "/raw";
             var fileList = new List<string>();
-            var count = 0;
             foreach (var item in Directory.GetFiles(rawFolder, "*", SearchOption.AllDirectories))
             {
                 var reletivePath = item.Replace(rawFolder, "").Replace("\\", "/").TrimStart('/');
                 fileList.Add(reletivePath);
-                count += 1;
             }
-            Console.WriteLine($"File count: {count}");
             try
             {
+                var sw = new Stopwatch();
                 Console.WriteLine("=====Pack=====");
-                FilePacker.PackToFile(rawFolder, fileList, ipkPath, "Secret!!!");
+                sw.Restart();
+                FilePacker.PackToFile(rawFolder, fileList, ipkPath, "Secret!!!", true);
+                Console.WriteLine($"Packing cost: {sw.ElapsedMilliseconds / 1000f:F2} s");
+                Console.WriteLine($"Packed {fileList.Count} files");
                 Console.WriteLine("=====END======");
                 Console.WriteLine("====Unpack====");
-                FilePacker.UnpackFile(ipkPath, outputFolder, "Secret!!!");
+                sw.Restart();
+                var count = FilePacker.UnpackFile(ipkPath, outputFolder, "Secret!!!");
+                Console.WriteLine($"Unpacking cost: {sw.ElapsedMilliseconds / 1000f:F2} s");
+                Console.WriteLine($"Unpacked {count} files");
                 Console.WriteLine("=====END======");
                 Console.WriteLine("==ReadSingle==");
+                sw.Restart();
                 var content = FilePacker.ReadFileContent(ipkPath, "test.txt", "Secret!!!");
                 File.WriteAllBytes(testFolder + "/test.txt", content);
+                Console.WriteLine($"Unpacking single cost: {sw.ElapsedMilliseconds / 1000f:F2} s");
                 Console.WriteLine("=====END======");
             }
             catch (Exception e)

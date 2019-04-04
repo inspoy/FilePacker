@@ -8,7 +8,7 @@ namespace Instech.FilePacker
 {
     internal class UnpackTool
     {
-        public static void UnpackAll(string filePath, string targetFolder, string key = null)
+        public static int UnpackAll(string filePath, string targetFolder, string key = null)
         {
             if (!File.Exists(filePath))
             {
@@ -19,7 +19,7 @@ namespace Instech.FilePacker
                 throw new InvalidOperationException("Target folder exists.");
             }
             Directory.CreateDirectory(targetFolder);
-            var fileList = LoadIpm(filePath);
+            var fileList = LoadIpm(filePath, out var compress);
             Rc4 rc4 = null;
             if (!string.IsNullOrEmpty(key))
             {
@@ -29,7 +29,7 @@ namespace Instech.FilePacker
             {
                 foreach (var item in fileList)
                 {
-                    fs.Seek((long)item.Value.Offset + 8, SeekOrigin.Begin);
+                    fs.Seek((long)item.Value.Offset + 8 + 1, SeekOrigin.Begin);
                     var content = new byte[item.Value.Length];
                     fs.Read(content, 0, (int)item.Value.Length);
                     var itemPath = Path.Combine(targetFolder, item.Key);
@@ -38,22 +38,27 @@ namespace Instech.FilePacker
                     {
                         Directory.CreateDirectory(itemFolder);
                     }
-                    Console.WriteLine("Outputting: " + itemPath);
                     if (rc4 != null)
                     {
                         var cryptKey = PackTool.GetCryptKey(item.Key, key);
                         rc4.SetKeyAndInit(cryptKey);
                         content = rc4.Encrypt(content);
                     }
+                    if (compress)
+                    {
+                        // 先解密再解压
+                        content = K4os.Compression.LZ4.LZ4Codec.Unpickle(content);
+                    }
                     File.WriteAllBytes(itemPath, content);
                 }
             }
+            return fileList.Count;
         }
 
         public static byte[] UnpackSingle(string filePath, string fileName, string key = null)
         {
 
-            var fileList = LoadIpm(filePath);
+            var fileList = LoadIpm(filePath, out var compress);
             if (!fileList.ContainsKey(fileName))
             {
                 throw new KeyNotFoundException($"{fileName} does not exist in {filePath}");
@@ -61,7 +66,7 @@ namespace Instech.FilePacker
             var ipmItem = fileList[fileName];
             using (var fs = new FileStream(filePath, FileMode.Open))
             {
-                fs.Seek((long)ipmItem.Offset + 8, SeekOrigin.Begin);
+                fs.Seek((long)ipmItem.Offset + 8 + 1, SeekOrigin.Begin);
                 var content = new byte[ipmItem.Length];
                 fs.Read(content, 0, (int)ipmItem.Length);
                 if (!string.IsNullOrEmpty(key))
@@ -70,12 +75,18 @@ namespace Instech.FilePacker
                     rc4.SetKeyAndInit(PackTool.GetCryptKey(fileName, key));
                     content = rc4.Encrypt(content);
                 }
+                if (compress)
+                {
+                    // 先解密再解压
+                    content = K4os.Compression.LZ4.LZ4Codec.Unpickle(content);
+                }
                 return content;
             }
         }
 
-        public static Dictionary<string, FileItemMeta> LoadIpm(string ipkPath)
+        public static Dictionary<string, FileItemMeta> LoadIpm(string ipkPath, out bool compress)
         {
+            compress = false;
             if (!File.Exists(ipkPath))
             {
                 throw new InvalidOperationException("Ipk file does not exist.");
@@ -87,8 +98,9 @@ namespace Instech.FilePacker
                 using (var br = new BinaryReader(fs, Encoding.UTF8, true))
                 {
                     length = br.ReadUInt64();
+                    compress = br.ReadByte() == 1;
                 }
-                fs.Seek((long)length + 8, SeekOrigin.Begin);
+                fs.Seek((long)length + 8 + 1, SeekOrigin.Begin);
                 using (var br = new BinaryReader(fs))
                 {
                     var count = br.ReadInt32();

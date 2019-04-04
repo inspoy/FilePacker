@@ -5,10 +5,10 @@ namespace Instech.FilePacker
 {
     public static class FilePacker
     {
-        public static void PackToFile(string basePath, List<string> filePaths, string targetPath, string key = null)
+        public static void PackToFile(string basePath, List<string> filePaths, string targetPath, string key = null, bool compress = true)
         {
             var packTool = new PackTool(targetPath);
-            packTool.Create(key);
+            packTool.Create(key, compress);
             foreach (var fileName in filePaths)
             {
                 var fullPath = Path.Combine(basePath, fileName);
@@ -18,9 +18,9 @@ namespace Instech.FilePacker
             packTool.Save();
         }
 
-        public static void UnpackFile(string filePath, string targetFolder, string key = null)
+        public static int UnpackFile(string filePath, string targetFolder, string key = null)
         {
-            UnpackTool.UnpackAll(filePath, targetFolder, key);
+            return UnpackTool.UnpackAll(filePath, targetFolder, key);
         }
 
         public static byte[] ReadFileContent(string filePath, string fileName, string key = null)
