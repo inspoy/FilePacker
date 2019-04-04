@@ -7,4 +7,4 @@
 * Read partial content(done)
 * Pack with RC4 encrypt(done)
 * Combine ipk and ipm(done)
-* Compress with gzip
+* Compress with lz4(done)
