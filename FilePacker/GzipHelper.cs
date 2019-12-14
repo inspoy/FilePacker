@@ -1,3 +1,11 @@
+/**
+ * == Inspoy Technology ==
+ * Assembly: Instech.FilePacker
+ * FileName: GzipHelper.cs
+ * Created on 2019/12/15 by inspo
+ * All rights reserved.
+ */
+
 using System.IO;
 using System.IO.Compression;
 

@@ -1,4 +1,12 @@
-﻿using System.IO;
+﻿/**
+ * == Inspoy Technology ==
+ * Assembly: Instech.FilePacker
+ * FileName: FilePacker.cs
+ * Created on 2019/12/15 by inspo
+ * All rights reserved.
+ */
+
+using System.IO;
 using System.Collections.Generic;
 
 namespace Instech.FilePacker

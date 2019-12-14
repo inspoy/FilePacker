@@ -1,0 +1,13 @@
+{
+    "name": "cc.inspoy.filepacker",
+    "displayName": "Instech.FilePacker",
+    "version": "0.0.1",
+    "unity": "2019.1",
+    "description": "提供文件打包功能，支持压缩加密，用于资源打包，纯C#无依赖",
+    "keywords": [
+      "instech",
+      "pack"
+    ],
+    "dependencies": {
+    }
+  }
