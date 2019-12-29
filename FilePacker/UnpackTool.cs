@@ -92,8 +92,16 @@ namespace Instech.FilePacker
             }
         }
 
+        private static Dictionary<string, (bool, Dictionary<string, FileItemMeta>)> _cachedIpm = new Dictionary<string, (bool, Dictionary<string, FileItemMeta>)>();
+
         public static Dictionary<string, FileItemMeta> LoadIpm(string ipkPath, out bool compress)
         {
+            if (_cachedIpm.TryGetValue(ipkPath, out var cachedItem))
+            {
+                compress = cachedItem.Item1;
+                return cachedItem.Item2;
+            }
+
             compress = false;
             if (!File.Exists(ipkPath))
             {
