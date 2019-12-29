@@ -65,14 +65,13 @@ namespace Instech.FilePacker
 
         public static byte[] UnpackSingle(string filePath, string fileName, string key = null)
         {
-
             var fileList = LoadIpm(filePath, out var compress);
             if (!fileList.ContainsKey(fileName))
             {
                 throw new KeyNotFoundException($"{fileName} does not exist in {filePath}");
             }
             var ipmItem = fileList[fileName];
-            using (var fs = new FileStream(filePath, FileMode.Open))
+            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
                 fs.Seek((long)ipmItem.Offset + 8 + 1, SeekOrigin.Begin);
                 var content = new byte[ipmItem.Length];

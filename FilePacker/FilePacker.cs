@@ -8,6 +8,7 @@
 
 using System.IO;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Instech.FilePacker
 {
@@ -38,6 +39,12 @@ namespace Instech.FilePacker
                 throw new FileNotFoundException("File does not exist", filePath);
             }
             return UnpackTool.UnpackSingle(filePath, fileName, key);
+        }
+
+        public static async Task<byte[]> ReadFileContentAsync(string filePath, string fileName, string key = null)
+        {
+            var content = await Task.Run(() => ReadFileContent(filePath, fileName, key));
+            return content;
         }
     }
 }
