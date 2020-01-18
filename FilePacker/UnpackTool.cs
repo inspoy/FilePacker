@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Instech.CryptHelper;
+using Instech.EncryptHelper;
 
 namespace Instech.FilePacker
 {

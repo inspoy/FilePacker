@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Instech.CryptHelper;
+using Instech.EncryptHelper;
 using K4os.Compression.LZ4;
 
 namespace Instech.FilePacker

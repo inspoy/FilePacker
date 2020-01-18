@@ -1,7 +1,8 @@
 {
     "name": "Instech.FilePacker",
-    "references": [],
-    "optionalUnityReferences": [],
+    "references": [
+        "GUID:10d4aba4f62d4f9429b89442b64bf6b3"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
@@ -9,5 +10,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }
