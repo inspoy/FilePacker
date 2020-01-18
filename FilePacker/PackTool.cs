@@ -85,7 +85,7 @@ namespace Instech.FilePacker
             {
                 // 使用RC4算法加密
                 _rc4.SetKeyAndInit(GetCryptKey(fileKey, _key));
-                content = _rc4.Encrypt(content);
+                _rc4.Encrypt(content);
             }
             _bw.Write(content);
             _fileList.Add(fileKey, new FileItemMeta

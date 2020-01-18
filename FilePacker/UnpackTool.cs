@@ -50,7 +50,7 @@ namespace Instech.FilePacker
                     {
                         var cryptKey = PackTool.GetCryptKey(item.Key, key);
                         rc4.SetKeyAndInit(cryptKey);
-                        content = rc4.Encrypt(content);
+                        rc4.Encrypt(content);
                     }
                     if (compress)
                     {
@@ -80,7 +80,7 @@ namespace Instech.FilePacker
                 {
                     var rc4 = new Rc4();
                     rc4.SetKeyAndInit(PackTool.GetCryptKey(fileName, key));
-                    content = rc4.Encrypt(content);
+                    rc4.Encrypt(content);
                 }
                 if (compress)
                 {
